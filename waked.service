@@ -1,0 +1,19 @@
+[Unit]
+Description=HTTP server to send wake-on-lan packets with etherwake
+After=network.target syslog.target
+Requires=
+Wants=
+PartOf=
+
+[Service]
+Type=simple
+
+ExecStart=/usr/local/bin/plambertnet-waked --config /etc/waked.conf
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+Alias=
+

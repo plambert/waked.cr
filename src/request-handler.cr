@@ -17,13 +17,12 @@ class Wake::RequestHandler
         error = IO::Memory.new
         status = Process.run command: "sudo", args: ["etherwake", "-i", @interface, "-D", mac_addr], chdir: "/", output: output, error: error
         if status.success?
-          context.response.output << output.to_s
-          context.response.output << '\n'
+          context.response.puts output.to_s
+          context.response.puts error.to_s
           context.response.respond_with_status status: 200, message: "packet sent"
           context.response.close
         else
-          context.response.output << {output: output.to_s, error: error.to_s}.to_pretty_json
-          context.response.output << '\n'
+          context.response.puts({output: output.to_s, error: error.to_s}.to_pretty_json)
           context.response.respond_with_status status: 500, message: "etherwake failed"
           context.response.close
         end

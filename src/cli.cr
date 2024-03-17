@@ -112,7 +112,7 @@ class Wake::CLI
       end
     end
     if pre = hash["prefix"]?.try(&.as_s?)
-      @prefix ||= hash["prefix"].as_s
+      @prefix ||= pre
     end
     cfg
   end

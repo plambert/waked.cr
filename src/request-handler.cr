@@ -17,24 +17,24 @@ class Wake::RequestHandler
         error = IO::Memory.new
         status = Process.run command: "sudo", args: ["etherwake", "-i", @interface, "-D", mac_addr], chdir: "/", output: output, error: error
         if status.success?
-          context.response.respond_with_status status: 200, message: "packet sent"
           context.response.output << output.to_s
           context.response.output << '\n'
+          context.response.respond_with_status status: 200, message: "packet sent"
           context.response.close
         else
-          context.response.respond_with_status status: 500, message: "etherwake failed"
           context.response.output << {output: output.to_s, error: error.to_s}.to_pretty_json
           context.response.output << '\n'
+          context.response.respond_with_status status: 500, message: "etherwake failed"
           context.response.close
         end
       else
-        context.response.respond_with_status status: 500, message: "invalid device"
         context.response.output.puts "#{context.request.path}: invalid device name"
+        context.response.respond_with_status status: 500, message: "invalid device"
         context.response.close
       end
     else
-      context.response.respond_with_status status: 500, message: "invalid path"
       context.response.output.puts "#{context.request.path}: invalid request path"
+      context.response.respond_with_status status: 500, message: "invalid path"
       context.response.close
     end
   end

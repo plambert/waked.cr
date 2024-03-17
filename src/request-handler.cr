@@ -19,27 +19,30 @@ class Wake::RequestHandler
         if status.success?
           context.response.puts output.to_s
           context.response.puts error.to_s
-          context.response.status = 200
+          context.response.status = :ok
           context.response.status_message = "packet sent"
           # context.response.respond_with_status status: 200, message: "packet sent"
           # context.response.close
         else
           context.response.puts({output: output.to_s, error: error.to_s}.to_pretty_json)
-          context.response.status = 500
+          context.response.status = :server_error
           context.response.status_message = "etherwake failed"
           # context.response.respond_with_status status: 500, message: "etherwake failed"
           # context.response.close
         end
       else
         context.response.output.puts "#{context.request.path}: invalid device name"
-        context.response.status = 500
+        context.response.status = :server_error
         context.response.status_message = "invalid device"
         # context.response.respond_with_status status: 500, message: "invalid device"
         # context.response.close
       end
     else
       context.response.output.puts "#{context.request.path}: invalid request path"
-      context.response.respond_with_status status: 500, message: "invalid path"
+      context.response.status = :server_error
+      context.response.status_message = "invalid path"
+      context.response.output.puts "invalid path: #{context.request.path.inspect}"
+      # context.response.respond_with_status status: :server_error, message: "invalid path"
       # context.response.close
     end
   end

@@ -5,12 +5,19 @@ class Wake::RequestHandler
   include HTTP::Handler
   property devices : Hash(String, String)
   property interface : String
+  property prefix : String = ""
 
-  def initialize(@devices, @interface)
+  def initialize(@devices, @interface, prefix _prefix : String?)
+    if _prefix
+      @prefix = _prefix
+      @prefix = "/" + @prefix.lstrip('/')
+      @prefix = @prefix.rstrip('/')
+      @prefix = "" if @prefix == "/"
+    end
   end
 
   def call(context)
-    if context.request.path =~ %r{^/(\w+)$}
+    if context.request.path =~ %r{^#{Regex.escape(@prefix)}/(\w+)$}
       context.response.content_type = "text/plain"
       if mac_addr = @devices[$1]?
         output = IO::Memory.new

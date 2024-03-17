@@ -13,6 +13,7 @@ class Wake::CLI
   property listen_host : String = DEFAULT_LISTEN_ADDRESS
   property interface : String
   property devices = {} of String => String
+  property prefix : String? = nil
 
   # ameba:disable Metrics/CyclomaticComplexity
   def initialize(@arguments = ARGV)
@@ -28,6 +29,8 @@ class Wake::CLI
         _host = opts.shift? || raise ArgumentError.new "#{opt}: expected an ip address on which to listen"
       when "--interface"
         _iface = opts.shift? || raise ArgumentError.new "#{opt}: expected an interface name"
+      when "--prefix"
+        @prefix = opts.shift? || raise ArgumentError.new "#{opt}: expected a prefix argument"
       when "--help"
         show_help
         exit 0
@@ -50,7 +53,7 @@ class Wake::CLI
     devices.each do |key, value|
       Log.info { "device #{key} at #{value}" }
     end
-    @server = Wake::Server.new host: @listen_host, port: @listen_port, interface: @interface, devices: @devices
+    @server = Wake::Server.new host: @listen_host, port: @listen_port, interface: @interface, devices: @devices, prefix: @prefix
   end
 
   def run
@@ -107,6 +110,9 @@ class Wake::CLI
       else
         raise ArgumentError.new "#{configpath}: devices: expected an object (string -> string)"
       end
+    end
+    if pre = hash["prefix"]?.try(&.as_s?)
+      @prefix ||= hash["prefix"].as_s
     end
     cfg
   end
